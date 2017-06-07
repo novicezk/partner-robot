@@ -1,0 +1,124 @@
+.right-Avatar {
+  float: right;
+  width: 85rpx;
+  height: 85rpx;
+}
+
+.right-Triangle {
+  float: right;
+  margin-top: 35rpx;
+  width: 0;
+  height: 0;
+  border-top: 16rpx solid transparent;
+  border-left: 24rpx solid yellowgreen;
+  border-bottom: 16rpx solid transparent;
+}
+
+.right-message {
+  float: right;
+  margin-top: 10rpx;
+  line-height: 65rpx;
+  background: yellowgreen;
+  border-radius: 10rpx;
+  font-size: 32rpx;
+}
+
+.right-speech-message {
+  float: right;
+  margin-top: 10rpx;
+  line-height: 65rpx;
+  background: yellowgreen;
+  border-radius: 10rpx;
+  font-size: 32rpx;
+  width: 150rpx;
+}
+
+.left-speech-message {
+  float: left;
+  margin-top: 10rpx;
+  line-height: 65rpx;
+  background: yellowgreen;
+  border-radius: 10rpx;
+  font-size: 32rpx;
+  width: 150rpx;
+}
+
+.left-Avatar {
+  float: left;
+  width: 85rpx;
+  height: 85rpx;
+}
+
+.left-Triangle {
+  float: left;
+  margin-top: 35rpx;
+  width: 0;
+  height: 0;
+  border-top: 16rpx solid transparent;
+  border-right: 24rpx solid yellowgreen;
+  border-bottom: 16rpx solid transparent;
+}
+
+.left-message {
+  float: left;
+  margin-top: 10rpx;
+  line-height: 65rpx;
+  background: yellowgreen;
+  border-radius: 10rpx;
+  font-size: 32rpx;
+}
+
+.speech-button {
+  height: 70rpx;
+  margin-left: 30rpx;
+  margin-right: 30rpx;
+  line-height: 70rpx;
+  background: white;
+}
+
+.button-hover {
+  background-color: rgba(0, 0, 0, 0.1);
+  opacity: 0.7;
+}
+
+.icon {
+  vertical-align: middle;
+  margin-top: 8rpx;
+  width: 64rpx;
+  height: 64rpx;
+}
+
+.ion-ios {
+  background-size: 64rpx 64rpx;
+  background-repeat: no-repeat;
+  background-position: center center;
+  vertical-align: middle;
+}
+
+.emotion {
+  width: 64rpx;
+  height: 64rpx;
+  line-height: 64rpx;
+  margin: 10rpx;
+}
+
+#emotionPanel {
+  padding-left: 40rpx;
+}
+
+.moreImage {
+  width: 80rpx;
+  height: 80rpx;
+  padding: 16rpx;
+  border: 2rpx solid #e3e3e3;
+  border-radius: 20rpx;
+  background: #f3f3f3;
+  margin: 10rpx;
+}
+
+.send-button {
+  margin-left: 10rpx;
+  margin-top: 8rpx;
+  height: 64rpx;
+  line-height: 64rpx;
+}
