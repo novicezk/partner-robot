@@ -106,16 +106,6 @@
   padding-left: 40rpx;
 }
 
-.moreImage {
-  width: 80rpx;
-  height: 80rpx;
-  padding: 16rpx;
-  border: 2rpx solid #e3e3e3;
-  border-radius: 20rpx;
-  background: #f3f3f3;
-  margin: 10rpx;
-}
-
 .send-button {
   margin-left: 10rpx;
   margin-top: 8rpx;

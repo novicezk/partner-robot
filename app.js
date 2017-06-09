@@ -1,6 +1,20 @@
 //app.js
 App({
   onLaunch: function () {
+    wx.getSetting({
+      success(res) {
+        if (!res['scope.record']) {
+          wx.authorize({
+            scope: 'scope.record'
+          })
+        }
+        if (!res['scope.userInfo']) {
+          wx.authorize({
+            scope: 'scope.userInfo'
+          })
+        }
+      }
+    })
     wx.login({
       success: function (data) {
         wx.getUserInfo({

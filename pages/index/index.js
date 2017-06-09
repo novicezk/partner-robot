@@ -6,10 +6,11 @@ Page({
     messages: [],
     isSpeech: false,
     emijs: ['不高兴', '乖', '亲亲', '冷漠', '切~', '勉强', '吃惊', '吐舌', '呵呵', '呼~', '咦', '哈哈', '哭', '喷', '委屈', '开心', '得意', '怒', '恶心', '惊哭', '惊讶', '汗', '滑稽', '狂汗', '生气', '疑问', '真棒', '睡觉', '笑眼', '萌萌哒', '鄙视', '阴险', '黑线'],
-    animation: {},
-    animation_2: {},
-    tap: "tapOff",
-    height: 0,
+    scrollHeight: 0,
+    toView: '',
+    windowHeight: 0,
+    windowWidth: 0,
+    pxToRpx: 2,
     msg: '',
     emotionBox: false,
     emotions: [],
@@ -17,16 +18,6 @@ Page({
     changeImageUrl: 'https://homolo.top/voice.png',
     speechIcon: 'https://homolo.top/speech0.png',
     playingSpeech: ''
-  },
-  tapscroll(e) {
-    this.setData({
-      emotionBox: false,
-    })
-    this.animation_2.height(this.data.height - 50).step();
-    this.setData({ animation_2: this.animation_2.export() })
-    this.setData({
-      tap: "tapOff"
-    })
   },
   chooseEmotion(e) {
     this.setData({
@@ -39,15 +30,6 @@ Page({
     })
   },
   onLoad() {
-    wx.getSetting({
-      success(res) {
-        if (!res['scope.record']) {
-          wx.authorize({
-            scope: 'scope.record'
-          })
-        }
-      }
-    })
     var that = this
     let emotions = []
     let emijs = that.data.emijs
@@ -64,14 +46,12 @@ Page({
     wx.getSystemInfo({
       success: (res) => {
         this.setData({
-          height: res.windowHeight
+          windowHeight: res.windowHeight,
+          pxToRpx: 750 / res.screenWidth,
+          scrollHeight: (res.windowHeight - 50) * 750 / res.screenWidth
         })
       }
     })
-  },
-  onReady() {
-    this.animation = wx.createAnimation();
-    this.animation_2 = wx.createAnimation()
   },
   onShareAppMessage: function () {
     return {
@@ -80,21 +60,22 @@ Page({
     }
   },
   emotionBtn() {
-    this.setData({
-      emotionBox: (this.data.tap == 'tapOff') ? true : false
-    })
-    if (this.data.tap == "tapOff") {
-      this.animation_2.height(this.data.height - 200).step();
-      this.setData({ animation_2: this.animation_2.export() })
+    if (this.data.emotionBox) {
       this.setData({
-        tap: "tapOn"
+        emotionBox: false,
+        scrollHeight: (this.data.windowHeight - 50) * this.data.pxToRpx
       })
     } else {
-      this.animation_2.height(this.data.height - 50).step();
-      this.setData({ animation_2: this.animation_2.export() })
       this.setData({
-        tap: "tapOff"
+        emotionBox: true,
+        scrollHeight: (this.data.windowHeight - 285) * this.data.pxToRpx
       })
+      if (this.data.isSpeech) {
+        this.setData({
+          isSpeech: false,
+          changeImageUrl: 'https://homolo.top/voice.png'
+        });
+      }
     }
   }, changeType: function () {
     if (this.data.isSpeech) {
@@ -105,7 +86,9 @@ Page({
     } else {
       this.setData({
         isSpeech: true,
-        changeImageUrl: 'https://homolo.top/keyinput.jpg'
+        changeImageUrl: 'https://homolo.top/keyinput.jpg',
+        emotionBox: false,
+        scrollHeight: (this.data.windowHeight - 50) * this.data.pxToRpx
       });
     }
   },
@@ -113,18 +96,16 @@ Page({
     var that = this;
     let msg = this.data.msg
     let contents = util.getContents(msg)
-
-    let data = { contents: contents, me: true, avatar: wx.getStorageSync('userInfo').avatarUrl, speech: false }
+    let id = 'id_' + Date.parse(new Date()) / 1000;
+    let data = { id: id, contents: contents, me: true, avatar: wx.getStorageSync('userInfo').avatarUrl, speech: false }
     let messages = this.data.messages
     messages.push(data)
     this.setData({
       messages: messages,
       msg: ''
     })
-    this.animation_2.height(this.data.height - 50).step();
-    this.setData({ animation_2: this.animation_2.export() })
     this.setData({
-      tap: "tapOff"
+      toView: id
     })
     wx.request({
       url: 'https://homolo.top/robot',
@@ -136,12 +117,16 @@ Page({
       success: function (res) {
         if (res.statusCode == 200) {
           let answer = res.data.text;
-          let contents = util.getContents(answer)
-          let data = { contents: contents, me: false, avatar: 'https://homolo.top/robot.jpg', speech: false }
+          let contents = util.getContents(answer, res.data.url)
+          let id = 'id_' + Date.parse(new Date()) / 1000;
+          let data = { id: id, contents: contents, me: false, avatar: 'https://homolo.top/robot.jpg', speech: false }
           let messages = that.data.messages
           messages.push(data)
           that.setData({
             messages: messages
+          })
+          that.setData({
+            toView: id
           })
         }
       }
@@ -161,13 +146,16 @@ Page({
         clearInterval(interval);
         var tempFilePath = res.tempFilePath
         seconds = seconds == 0 ? 1 : seconds;
-        let data = { me: true, avatar: wx.getStorageSync('userInfo').avatarUrl, speech: true, seconds: seconds, filePath: tempFilePath }
+        let id = 'id_' + Date.parse(new Date()) / 1000;
+        let data = { id: id, me: true, avatar: wx.getStorageSync('userInfo').avatarUrl, speech: true, seconds: seconds, filePath: tempFilePath }
         let messages = that.data.messages
         messages.push(data)
         that.setData({
           messages: messages
         });
-
+        that.setData({
+          toView: id
+        })
         wx.uploadFile({
           url: 'https://homolo.top/upload/' + wx.getStorageSync('openid'),
           filePath: tempFilePath,
@@ -180,14 +168,17 @@ Page({
             if (resData.code == 102) {
               let answer = resData.text;
               let contents = util.getContents(answer)
-              let data = { contents: contents, me: false, avatar: 'https://homolo.top/robot.jpg', speech: false }
+              let id = 'id_' + Date.parse(new Date()) / 1000;
+              let data = { id: id, contents: contents, me: false, avatar: 'https://homolo.top/robot.jpg', speech: false }
               let messages = that.data.messages
               messages.push(data)
               that.setData({
                 messages: messages
               })
+              that.setData({
+                toView: id
+              })
             } else if (resData.code == 101) {
-              var duration = 0;
               var isFirst = true;
               wx.playBackgroundAudio({
                 dataUrl: 'https://homolo.top/' + resData.file
@@ -199,14 +190,18 @@ Page({
                       return;
                     }
                     isFirst = false;
-                    duration = res.duration
+                    let duration = res.duration;
                     wx.stopBackgroundAudio();
-                    let data = { me: false, avatar: 'https://homolo.top/robot.jpg', speech: true, seconds: duration, filePath: 'https://homolo.top/' + resData.file }
+                    let id = 'id_' + Date.parse(new Date()) / 1000;
+                    let data = { id: id, me: false, avatar: 'https://homolo.top/robot.jpg', speech: true, seconds: duration == 0 ? 1 : duration, filePath: 'https://homolo.top/' + resData.file }
                     let messages = that.data.messages
                     messages.push(data)
                     that.setData({
                       messages: messages
                     });
+                    that.setData({
+                      toView: id
+                    })
                   }
                 })
               });
