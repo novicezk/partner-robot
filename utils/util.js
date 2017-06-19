@@ -17,7 +17,7 @@ function formatNumber(n) {
 
 function insertStrOnceSize(content, str, size) {
   if (content.length <= size) return content;
-  return content.substring(0, size) + "\n" + insertStrOnceSize(content.substring(15, content.length), '\n', size);
+  return content.substring(0, size) + str + insertStrOnceSize(content.substring(15, content.length), str, size);
 }
 
 function getContents(msg, url) {
