@@ -1,6 +1,7 @@
 //index.js
 var util = require('../../utils/util')
 const app = getApp()
+const host = app.globalData.host
 Page({
   data: {
     messages: [],
@@ -15,8 +16,10 @@ Page({
     emotionBox: false,
     emotions: [],
     speechText: '按住 说话',
-    changeImageUrl: 'https://homolo.top/voice.png',
-    speechIcon: 'https://homolo.top/speech0.png',
+    changeImageUrl: host + '/static/images/voice.png',
+    speechIcon: host + '/static/images/speech0.png',
+    defaultSpeechIcon: host + '/static/images/speech0.png',
+    emotionIcon: host + '/static/images/emotion.png',
     playingSpeech: ''
   },
   chooseEmotion(e) {
@@ -35,7 +38,7 @@ Page({
     let emijs = that.data.emijs
     for (let i = 0; i < emijs.length; i++) {
       emotions.push({
-        src: 'https://homolo.top/emij/' + emijs[i] + '.png',
+        src: host + '/static/emoji/' + emijs[i] + '.png',
         id: i,
         name: emijs[i]
       })
@@ -73,7 +76,7 @@ Page({
       if (this.data.isSpeech) {
         this.setData({
           isSpeech: false,
-          changeImageUrl: 'https://homolo.top/voice.png'
+          changeImageUrl: host + '/static/images/voice.png'
         });
       }
     }
@@ -81,12 +84,12 @@ Page({
     if (this.data.isSpeech) {
       this.setData({
         isSpeech: false,
-        changeImageUrl: 'https://homolo.top/voice.png'
+        changeImageUrl: host + '/static/images/voice.png'
       });
     } else {
       this.setData({
         isSpeech: true,
-        changeImageUrl: 'https://homolo.top/keyinput.jpg',
+        changeImageUrl: host + '/static/images/keyinput.png',
         emotionBox: false,
         scrollHeight: (this.data.windowHeight - 50) * this.data.pxToRpx
       });
@@ -108,18 +111,18 @@ Page({
       toView: id
     })
     wx.request({
-      url: 'https://homolo.top/robot',
+      url: host + '/wx/robot',
       method: 'POST',
-      data: { 'info': msg, 'userid': wx.getStorageSync('openid') },
+      data: { 'info': msg, 'userid': wx.getStorageSync('openid'), 'username': wx.getStorageSync('userInfo').nickName },
       header: {
-        "Content-Type": "application/json"
+        "content-type": "application/json"
       },
       success: function (res) {
         if (res.statusCode == 200) {
           let answer = res.data.text;
           let contents = util.getContents(answer, res.data.url)
           let id = 'id_' + Date.parse(new Date()) / 1000;
-          let data = { id: id, contents: contents, me: false, avatar: 'https://homolo.top/robot.jpg', speech: false }
+          let data = { id: id, contents: contents, me: false, avatar: host + '/static/images/robot.jpg', speech: false }
           let messages = that.data.messages
           messages.push(data)
           that.setData({
@@ -156,20 +159,23 @@ Page({
         that.setData({
           toView: id
         })
+        let nickName = wx.getStorageSync('userInfo').nickName;
+        if (!nickName) nickName = 'null';
         wx.uploadFile({
-          url: 'https://homolo.top/upload/' + wx.getStorageSync('openid'),
+          url: host + '/wx/uploadSilk',
           filePath: tempFilePath,
-          header: {
-            "Content-Type": "multipart/form-data"
-          },
           name: 'file',
+          formData: {
+            'userid': wx.getStorageSync('openid'),
+            'username': wx.getStorageSync('userInfo').nickName
+          },
           success: function (res) {
             let resData = JSON.parse(res.data);
             if (resData.code == 102) {
               let answer = resData.text;
               let contents = util.getContents(answer)
               let id = 'id_' + Date.parse(new Date()) / 1000;
-              let data = { id: id, contents: contents, me: false, avatar: 'https://homolo.top/robot.jpg', speech: false }
+              let data = { id: id, contents: contents, me: false, avatar: host + '/static/images/robot.jpg', speech: false }
               let messages = that.data.messages
               messages.push(data)
               that.setData({
@@ -181,7 +187,7 @@ Page({
             } else if (resData.code == 101) {
               var isFirst = true;
               wx.playBackgroundAudio({
-                dataUrl: 'https://homolo.top/' + resData.file
+                dataUrl: host + '/static/' + resData.text
               });
               wx.onBackgroundAudioPlay(function () {
                 wx.getBackgroundAudioPlayerState({
@@ -193,7 +199,7 @@ Page({
                     let duration = res.duration;
                     wx.stopBackgroundAudio();
                     let id = 'id_' + Date.parse(new Date()) / 1000;
-                    let data = { id: id, me: false, avatar: 'https://homolo.top/robot.jpg', speech: true, seconds: duration == 0 ? 1 : duration, filePath: 'https://homolo.top/' + resData.file }
+                    let data = { id: id, me: false, avatar: host + '/static/images/robot.jpg', speech: true, seconds: duration == 0 ? 1 : duration, filePath: host + '/static/' + resData.text }
                     let messages = that.data.messages
                     messages.push(data)
                     that.setData({
@@ -206,6 +212,9 @@ Page({
                 })
               });
             }
+          },
+          fail: function (err) {
+            console.log(err)
           }
         })
       },
@@ -229,7 +238,7 @@ Page({
     var num = 1;
     var interval = setInterval(function () {
       that.setData({
-        speechIcon: 'https://homolo.top/speech' + num % 3 + '.png'
+        speechIcon: host + '/static/images/speech' + num % 3 + '.png'
       });
       num++;
     }, 500);
@@ -238,7 +247,7 @@ Page({
       complete: function () {
         clearInterval(interval);
         that.setData({
-          speechIcon: 'https://homolo.top/speech0.png',
+          speechIcon: host + '/static/images/speech0.png',
           playingSpeech: ''
         });
       }
@@ -253,7 +262,7 @@ Page({
     var num = 1;
     var interval = setInterval(function () {
       that.setData({
-        speechIcon: 'https://homolo.top/speech' + num % 3 + '.png'
+        speechIcon: host + '/static/images/speech' + num % 3 + '.png'
       });
       num++;
     }, 500);
@@ -263,7 +272,7 @@ Page({
     wx.onBackgroundAudioStop(function () {
       clearInterval(interval);
       that.setData({
-        speechIcon: 'https://homolo.top/speech0.png',
+        speechIcon: host + '/static/images/speech0.png',
         playingSpeech: ''
       });
     })

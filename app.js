@@ -1,6 +1,10 @@
 //app.js
 App({
+  globalData: {
+    host: 'https://homolo.top'
+  },
   onLaunch: function () {
+    var that = this;
     wx.getSetting({
       success(res) {
         if (!res['scope.record']) {
@@ -27,7 +31,7 @@ App({
         })
         wx.request({
           method: 'GET',
-          url: 'https://homolo.top/getOpenid/' + data.code,
+          url: that.globalData.host + '/wx/getOpenid/' + data.code,
           success: function (res) {
             wx.setStorage({
               key: 'openid',

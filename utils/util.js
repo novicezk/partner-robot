@@ -1,4 +1,5 @@
 var emijs = ['不高兴', '乖', '亲亲', '冷漠', '切~', '勉强', '吃惊', '吐舌', '呵呵', '呼~', '咦', '哈哈', '哭', '喷', '委屈', '开心', '得意', '怒', '恶心', '惊哭', '惊讶', '汗', '滑稽', '狂汗', '生气', '疑问', '真棒', '睡觉', '笑眼', '萌萌哒', '鄙视', '阴险', '黑线']
+const host = getApp().globalData.host
 function formatTime(time) {
   const date = new Date(time)
   var year = date.getFullYear()
@@ -17,7 +18,7 @@ function formatNumber(n) {
 
 function insertStrOnceSize(content, str, size) {
   if (content.length <= size) return content;
-  return content.substring(0, size) + str + insertStrOnceSize(content.substring(15, content.length), str, size);
+  return content.substring(0, size) + "\n" + insertStrOnceSize(content.substring(15, content.length), '\n', size);
 }
 
 function getContents(msg, url) {
@@ -42,7 +43,7 @@ function getContents(msg, url) {
       }
       contents.push({
         type: 'image',
-        url: 'https://homolo.top/emij/' + emij + '.png'
+        url: host +'/static/emoji/' + emij + '.png'
       })
       msg = msg.substring(msg.indexOf(arr[i]) + arr[i].length, msg.length)
     }
