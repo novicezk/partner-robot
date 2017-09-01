@@ -1,12 +1,11 @@
-//index.js
 var util = require('../../utils/util')
 const app = getApp()
 const host = app.globalData.host
+var emojis = app.globalData.emojis
 Page({
   data: {
     messages: [],
     isSpeech: false,
-    emijs: ['不高兴', '乖', '亲亲', '冷漠', '切~', '勉强', '吃惊', '吐舌', '呵呵', '呼~', '咦', '哈哈', '哭', '喷', '委屈', '开心', '得意', '怒', '恶心', '惊哭', '惊讶', '汗', '滑稽', '狂汗', '生气', '疑问', '真棒', '睡觉', '笑眼', '萌萌哒', '鄙视', '阴险', '黑线'],
     scrollHeight: 0,
     toView: '',
     windowHeight: 0,
@@ -16,10 +15,10 @@ Page({
     emotionBox: false,
     emotions: [],
     speechText: '按住 说话',
-    changeImageUrl: host + '/static/images/voice.png',
-    speechIcon: host + '/static/images/speech0.png',
-    defaultSpeechIcon: host + '/static/images/speech0.png',
-    emotionIcon: host + '/static/images/emotion.png',
+    changeImageUrl: '/images/voice.png',
+    speechIcon: '/images/speech0.png',
+    defaultSpeechIcon: '/images/speech0.png',
+    emotionIcon: '/images/emotion.png',
     playingSpeech: ''
   },
   chooseEmotion(e) {
@@ -35,12 +34,11 @@ Page({
   onLoad() {
     var that = this
     let emotions = []
-    let emijs = that.data.emijs
-    for (let i = 0; i < emijs.length; i++) {
+    for (let i = 0; i < emojis.length; i++) {
       emotions.push({
-        src: host + '/static/emoji/' + emijs[i] + '.png',
+        src: '/emoji/' + util.getEmojiEn(emojis[i]) + '.png',
         id: i,
-        name: emijs[i]
+        name: emojis[i]
       })
     }
     this.setData({
@@ -76,7 +74,7 @@ Page({
       if (this.data.isSpeech) {
         this.setData({
           isSpeech: false,
-          changeImageUrl: host + '/static/images/voice.png'
+          changeImageUrl:  '/images/voice.png'
         });
       }
     }
@@ -84,12 +82,12 @@ Page({
     if (this.data.isSpeech) {
       this.setData({
         isSpeech: false,
-        changeImageUrl: host + '/static/images/voice.png'
+        changeImageUrl:  '/images/voice.png'
       });
     } else {
       this.setData({
         isSpeech: true,
-        changeImageUrl: host + '/static/images/keyinput.png',
+        changeImageUrl:  '/images/keyinput.png',
         emotionBox: false,
         scrollHeight: (this.data.windowHeight - 50) * this.data.pxToRpx
       });
@@ -122,9 +120,10 @@ Page({
           let answer = res.data.text;
           let contents = util.getContents(answer, res.data.url)
           let id = 'id_' + Date.parse(new Date()) / 1000;
-          let data = { id: id, contents: contents, me: false, avatar: host + '/static/images/robot.jpg', speech: false }
+          let data = { id: id, contents: contents, me: false, avatar:  '/images/robot.jpg', speech: false }
           let messages = that.data.messages
           messages.push(data)
+          console.log(messages)
           that.setData({
             messages: messages
           })
@@ -132,6 +131,9 @@ Page({
             toView: id
           })
         }
+      },
+      fail: function (res) {
+        console.log(res)
       }
     })
   },
@@ -175,7 +177,7 @@ Page({
               let answer = resData.text;
               let contents = util.getContents(answer)
               let id = 'id_' + Date.parse(new Date()) / 1000;
-              let data = { id: id, contents: contents, me: false, avatar: host + '/static/images/robot.jpg', speech: false }
+              let data = { id: id, contents: contents, me: false, avatar:   '/images/robot.jpg', speech: false }
               let messages = that.data.messages
               messages.push(data)
               that.setData({
@@ -199,7 +201,7 @@ Page({
                     let duration = res.duration;
                     wx.stopBackgroundAudio();
                     let id = 'id_' + Date.parse(new Date()) / 1000;
-                    let data = { id: id, me: false, avatar: host + '/static/images/robot.jpg', speech: true, seconds: duration == 0 ? 1 : duration, filePath: host + '/static/' + resData.text }
+                    let data = { id: id, me: false, avatar:   '/images/robot.jpg', speech: true, seconds: duration == 0 ? 1 : duration, filePath: host + '/static/' + resData.text }
                     let messages = that.data.messages
                     messages.push(data)
                     that.setData({
@@ -238,7 +240,7 @@ Page({
     var num = 1;
     var interval = setInterval(function () {
       that.setData({
-        speechIcon: host + '/static/images/speech' + num % 3 + '.png'
+        speechIcon: '/images/speech' + num % 3 + '.png'
       });
       num++;
     }, 500);
@@ -247,7 +249,7 @@ Page({
       complete: function () {
         clearInterval(interval);
         that.setData({
-          speechIcon: host + '/static/images/speech0.png',
+          speechIcon: '/images/speech0.png',
           playingSpeech: ''
         });
       }
@@ -262,7 +264,7 @@ Page({
     var num = 1;
     var interval = setInterval(function () {
       that.setData({
-        speechIcon: host + '/static/images/speech' + num % 3 + '.png'
+        speechIcon: '/images/speech' + num % 3 + '.png'
       });
       num++;
     }, 500);
@@ -272,7 +274,7 @@ Page({
     wx.onBackgroundAudioStop(function () {
       clearInterval(interval);
       that.setData({
-        speechIcon: host + '/static/images/speech0.png',
+        speechIcon: '/images/speech0.png',
         playingSpeech: ''
       });
     })

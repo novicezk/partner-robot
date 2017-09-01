@@ -1,5 +1,8 @@
-var emijs = ['不高兴', '乖', '亲亲', '冷漠', '切~', '勉强', '吃惊', '吐舌', '呵呵', '呼~', '咦', '哈哈', '哭', '喷', '委屈', '开心', '得意', '怒', '恶心', '惊哭', '惊讶', '汗', '滑稽', '狂汗', '生气', '疑问', '真棒', '睡觉', '笑眼', '萌萌哒', '鄙视', '阴险', '黑线']
-const host = getApp().globalData.host
+var globalData = getApp().globalData
+const host = globalData.host
+var emojis = globalData.emojis
+var emojisEn = globalData.emojisEn
+
 function formatTime(time) {
   const date = new Date(time)
   var year = date.getFullYear()
@@ -32,8 +35,9 @@ function getContents(msg, url) {
   }
   let arr = msg.match(/\[[^\[\]]+\]/g);
   for (let i in arr) {
-    let emij = arr[i].substring(1, arr[i].length - 1);
-    if (emijs.indexOf(emij) != -1) {
+    let emoji = arr[i].substring(1, arr[i].length - 1);
+    let index = emojis.indexOf(emoji);
+    if (index != -1) {
       let str = msg.substring(0, msg.indexOf(arr[i]));
       if (str) {
         contents.push({
@@ -43,7 +47,7 @@ function getContents(msg, url) {
       }
       contents.push({
         type: 'image',
-        url: host +'/static/emoji/' + emij + '.png'
+        url: '/emoji/' + emojisEn.slice(index, index + 1)[0] + '.png'
       })
       msg = msg.substring(msg.indexOf(arr[i]) + arr[i].length, msg.length)
     }
@@ -57,7 +61,13 @@ function getContents(msg, url) {
   return contents
 }
 
+function getEmojiEn(emoji) {
+  let index = emojis.indexOf(emoji);
+  return emojisEn.slice(index, index + 1)[0];
+}
+
 module.exports = {
   formatTime: formatTime,
-  getContents: getContents
+  getContents: getContents,
+  getEmojiEn: getEmojiEn
 }
