@@ -4,5 +4,5 @@
 + java服务端 [partner-java-server](https://github.com/zhukai-git/partner-java-server)
 + nodejs服务端 [partner-nodejs-server](https://github.com/zhukai-git/partner-nodejs-server)
 ### 已发布小程序：聊天机器人小Q
- ![](https://zhukai-git.github.io/partner-code.jpg)
+ ![](https://novicezk.github.io/partner-code.jpg)
 
